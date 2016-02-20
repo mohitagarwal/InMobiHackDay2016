@@ -9,8 +9,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.hackday.inmobi.inmobihackday.activities.NavdrawerActivity"
-    tools:showIn="@layout/app_bar_navdrawer">
+    tools:context=".activities.MapActivity"
+    tools:showIn="@layout/app_bar_main">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"

@@ -28,7 +28,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class NavdrawerActivity extends AppCompatActivity
+public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -157,12 +157,12 @@ public class NavdrawerActivity extends AppCompatActivity
         call.enqueue(new Callback<BaseResponse>() {
             @Override
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
-                Toast.makeText(NavdrawerActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapActivity.this, "Success", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(Call<BaseResponse> call, Throwable t) {
-                Toast.makeText(NavdrawerActivity.this, "Failure", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapActivity.this, "Failure", Toast.LENGTH_SHORT).show();
             }
         });
     }
