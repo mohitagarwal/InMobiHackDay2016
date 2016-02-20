@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by mohit.tibrewal on 20/02/16.
  */
 public class RetroFitApiService {
-    public static final String API_URL = "http://10.14.121.192:46000";
+    public static final String API_URL = "http://10.14.121.194:46000";
 
     public static ApiEndpoints instance;
 

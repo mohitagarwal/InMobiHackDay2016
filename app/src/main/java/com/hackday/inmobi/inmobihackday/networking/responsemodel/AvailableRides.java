@@ -11,6 +11,6 @@ import lombok.Data;
 @Data
 public class AvailableRides {
 
-    User user;
-    Location location;
+    User driver;
+    Location currentLocation;
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
@@ -19,7 +20,8 @@ import retrofit2.http.Query;
  */
 public interface ApiEndpoints {
 
-    @GET("requestRide")
+    @Headers({"Content-Type: application/json"})
+    @GET("rides")
     Call<List<AvailableRides>> requestRide(@Query("user_id") String userId,
                                            @Query("timestamp") long timestamp,
                                            @Query("start_lat") double currentLocationLat,
@@ -27,12 +29,15 @@ public interface ApiEndpoints {
                                            @Query("end_lat") double endLocationLat,
                                            @Query("end_lng") double endLocationLong);
 
-    @POST("registerRide")
+    @Headers({"Content-Type: application/json"})
+    @POST("rides")
     Call<RideDetails> registerRide(@Body RegisterRidePOJO postBody);
 
-    @POST("updateRiderLocation")
-    Call updateRiderLocation(@Body UpdateRiderLocationPOJO riderLocation);
+    @Headers({"Content-Type: application/json"})
+    @POST("rides/updateRiderLocation")
+    Call<String> updateRiderLocation(@Body UpdateRiderLocationPOJO riderLocation);
 
-    @POST("acceptRideRequest")
-    Call acceptRideRequest(@Body AcceptRideRequestPOJO postBody);
+    @Headers({"Content-Type: application/json"})
+    @POST("rides/acceptRideRequest")
+    Call<String> acceptRideRequest(@Body AcceptRideRequestPOJO postBody);
 }

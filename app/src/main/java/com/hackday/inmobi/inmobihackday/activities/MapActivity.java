@@ -6,12 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,15 +33,27 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.hackday.inmobi.inmobihackday.Config;
 import com.hackday.inmobi.inmobihackday.R;
 import com.hackday.inmobi.inmobihackday.helpers.HttpConnection;
 import com.hackday.inmobi.inmobihackday.helpers.PathJSONParser;
+import com.hackday.inmobi.inmobihackday.networking.RetroFitApiService;
+import com.hackday.inmobi.inmobihackday.networking.model.User;
+import com.hackday.inmobi.inmobihackday.networking.responsemodel.AcceptRideRequestPOJO;
+import com.hackday.inmobi.inmobihackday.networking.responsemodel.AvailableRides;
+import com.hackday.inmobi.inmobihackday.networking.responsemodel.RegisterRidePOJO;
+import com.hackday.inmobi.inmobihackday.networking.responsemodel.RideDetails;
+import com.hackday.inmobi.inmobihackday.networking.responsemodel.UpdateRiderLocationPOJO;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
@@ -48,7 +62,7 @@ public class MapActivity extends AppCompatActivity
 
     private GoogleMap mMap;
 
-    private Location sourceLocation;
+    private android.location.Location sourceLocation;
     private Double destinationLat;
     private Double destinationLng;
     private String destinationAddressString;
@@ -61,6 +75,16 @@ public class MapActivity extends AppCompatActivity
         setContentView(R.layout.activity_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                testAllAPI();
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -225,6 +249,95 @@ public class MapActivity extends AppCompatActivity
         return url;
     }
 
+    private void testAllAPI() {
+        getRides();
+        registerRide();
+        updateRiderLocation();
+        acceptRideRequest();
+
+    }
+
+    private void getRides(com.hackday.inmobi.inmobihackday.networking.model.Location fromLocation, com.hackday.inmobi.inmobihackday.networking.model.Location toLocation) {
+        Call<List<AvailableRides>> call = RetroFitApiService.getInstance().requestRide(Config.USER_ID,
+                System.currentTimeMillis(),
+                fromLocation.getLat(), fromLocation.getLng(),
+                toLocation.getLat(), toLocation.getLng());
+
+        call.enqueue(new Callback<List<AvailableRides>>() {
+            @Override
+            public void onResponse(Call<List<AvailableRides>> call, Response<List<AvailableRides>> response) {
+                Toast.makeText(MapActivity.this, "Success getRides", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<List<AvailableRides>> call, Throwable t) {
+                Toast.makeText(MapActivity.this, "Failure getRides", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void registerRide() {
+        RegisterRidePOJO payload = new RegisterRidePOJO();
+        payload.setTimestamp(System.currentTimeMillis());
+
+        Call<RideDetails> call = RetroFitApiService.getInstance().registerRide(payload);
+        call.enqueue(new Callback<RideDetails>() {
+            @Override
+            public void onResponse(Call<RideDetails> call, Response<RideDetails> response) {
+                Toast.makeText(MapActivity.this, "Success registerRide", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<RideDetails> call, Throwable t) {
+                Toast.makeText(MapActivity.this, "Failure registerRide", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateRiderLocation() {
+        UpdateRiderLocationPOJO payload = new UpdateRiderLocationPOJO();
+
+        User user = new User();
+        user.setUserId("4");
+
+        payload.setUser(user);
+
+        Call<String> call = RetroFitApiService.getInstance().updateRiderLocation(payload);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Toast.makeText(MapActivity.this, "Success updateRiderLocation", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(MapActivity.this, "Failure updateRiderLocation", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void acceptRideRequest() {
+        AcceptRideRequestPOJO payload = new AcceptRideRequestPOJO();
+
+        User user = new User();
+        user.setUserId("4");
+
+        payload.setRequestingUser(user);
+
+        Call<String> call = RetroFitApiService.getInstance().acceptRideRequest(payload);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Toast.makeText(MapActivity.this, "Success acceptRideRequest", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(MapActivity.this, "Failure acceptRideRequest", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void registerRidersRide() {
 //        Call<BaseResponse> call = RetroFitApiService.getInstance().registerRide();
@@ -246,7 +359,7 @@ public class MapActivity extends AppCompatActivity
     // *********************************************************************************************
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(android.location.Location location) {
         if (sourceLocation == null) {
             sourceLocation = location;
             tryToPlotPath();

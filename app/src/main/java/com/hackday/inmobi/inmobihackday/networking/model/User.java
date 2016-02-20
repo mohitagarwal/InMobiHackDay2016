@@ -1,6 +1,7 @@
 package com.hackday.inmobi.inmobihackday.networking.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.hackday.inmobi.inmobihackday.Config;
 
 import lombok.Data;
 
