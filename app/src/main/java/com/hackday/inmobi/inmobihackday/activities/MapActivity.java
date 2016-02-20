@@ -1,6 +1,8 @@
 package com.hackday.inmobi.inmobihackday.activities;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
+import android.animation.TypeEvaluator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +22,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Property;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,12 +33,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.hackday.inmobi.inmobihackday.Config;
 import com.hackday.inmobi.inmobihackday.R;
 import com.hackday.inmobi.inmobihackday.helpers.HttpConnection;
+import com.hackday.inmobi.inmobihackday.helpers.LatLngInterpolator;
 import com.hackday.inmobi.inmobihackday.helpers.PathJSONParser;
 import com.hackday.inmobi.inmobihackday.networking.RetroFitApiService;
 import com.hackday.inmobi.inmobihackday.networking.model.User;
@@ -59,6 +65,7 @@ public class MapActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
 
     public static final int REQUEST_CODE_LOCATION_SEARCH = 0;
+    private static final float ZOOM_VALUE = 12;
 
     private GoogleMap mMap;
 
@@ -66,8 +73,13 @@ public class MapActivity extends AppCompatActivity
     private Double destinationLat;
     private Double destinationLng;
     private String destinationAddressString;
+    private Marker currentPositionMarker;
+    private LatLng currentLatLng;
+
+    private boolean isMapReady = false;
 
     private LocationManager locationManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,16 +87,6 @@ public class MapActivity extends AppCompatActivity
         setContentView(R.layout.activity_map);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                testAllAPI();
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -111,13 +113,6 @@ public class MapActivity extends AppCompatActivity
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
@@ -161,12 +156,7 @@ public class MapActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -213,10 +203,19 @@ public class MapActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
         // Add a marker in Sydney and move the camera
         LatLng bangalore = new LatLng(12.9667, 77.5667);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(bangalore));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_VALUE));
+
+        if (currentLatLng != null && currentPositionMarker == null) {
+            addCurrentLocationMarker();
+        }
+        isMapReady = true;
     }
 
 
@@ -228,9 +227,11 @@ public class MapActivity extends AppCompatActivity
         LatLng sourceLatLng = new LatLng(sourceLocation.getLatitude(), sourceLocation.getLongitude());
         LatLng destinationLatLng = new LatLng(destinationLat, destinationLng);
 
-        mMap.addMarker(new MarkerOptions().position(sourceLatLng).title("I'm here"));
+        mMap.addMarker(new MarkerOptions().position(sourceLatLng).title("My source"));
         mMap.addMarker(new MarkerOptions().position(destinationLatLng).title(destinationAddressString));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sourceLatLng, 12));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sourceLatLng, ZOOM_VALUE));
+
+        addCurrentLocationMarker();
 
         (new ReadTask()).execute(getMapsApiDirectionsUrl(sourceLatLng, destinationLatLng));
     }
@@ -250,7 +251,7 @@ public class MapActivity extends AppCompatActivity
     }
 
     private void testAllAPI() {
-        getRides();
+//        getRides();
         registerRide();
         updateRiderLocation();
         acceptRideRequest();
@@ -338,32 +339,43 @@ public class MapActivity extends AppCompatActivity
         });
     }
 
-
-    private void registerRidersRide() {
-//        Call<BaseResponse> call = RetroFitApiService.getInstance().registerRide();
-//        call.enqueue(new Callback<BaseResponse>() {
-//            @Override
-//            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
-//                Toast.makeText(MapActivity.this, "Success", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onFailure(Call<BaseResponse> call, Throwable t) {
-//                Toast.makeText(MapActivity.this, "Failure", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-    }
-
     // *********************************************************************************************
     // * LocationListener
     // *********************************************************************************************
 
     @Override
     public void onLocationChanged(android.location.Location location) {
+        currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        if (isMapReady && currentPositionMarker == null) {
+            addCurrentLocationMarker();
+        }
+        if (currentPositionMarker != null) {
+            currentPositionMarker.setPosition(currentLatLng);
+            // animateMarkerToICS(currentPositionMarker, currentLatLng, new LatLngInterpolator.Spherical());
+        }
+
         if (sourceLocation == null) {
             sourceLocation = location;
             tryToPlotPath();
         }
+    }
+
+    static void animateMarkerToICS(Marker marker, LatLng finalPosition, final LatLngInterpolator latLngInterpolator) {
+        TypeEvaluator<LatLng> typeEvaluator = new TypeEvaluator<LatLng>() {
+            @Override
+            public LatLng evaluate(float fraction, LatLng startValue, LatLng endValue) {
+                return latLngInterpolator.interpolate(fraction, startValue, endValue);
+            }
+        };
+        Property<Marker, LatLng> property = Property.of(Marker.class, LatLng.class, "position");
+        ObjectAnimator animator = ObjectAnimator.ofObject(marker, property, typeEvaluator, finalPosition);
+        animator.setDuration(100);
+        animator.start();
+    }
+
+    private void addCurrentLocationMarker() {
+        currentPositionMarker = mMap.addMarker(new MarkerOptions().position(currentLatLng).title("I'm here").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, ZOOM_VALUE));
     }
 
     @Override
@@ -423,12 +435,12 @@ public class MapActivity extends AppCompatActivity
 
         @Override
         protected void onPostExecute(List<List<HashMap<String, String>>> routes) {
-            ArrayList<LatLng> points = null;
+            ArrayList<LatLng> points;
             PolylineOptions polyLineOptions = null;
 
             // traversing through routes
             for (int i = 0; i < routes.size(); i++) {
-                points = new ArrayList<LatLng>();
+                points = new ArrayList<>();
                 polyLineOptions = new PolylineOptions();
                 List<HashMap<String, String>> path = routes.get(i);
 
