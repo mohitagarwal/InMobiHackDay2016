@@ -12,13 +12,43 @@
     tools:context="com.hackday.inmobi.inmobihackday.activities.NavdrawerActivity"
     tools:showIn="@layout/app_bar_navdrawer">
 
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:map="http://schemas.android.com/apk/res-auto"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.hackday.inmobi.inmobihackday.activities.MapsActivity" />
+        android:orientation="vertical">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8"
+            tools:context="com.hackday.inmobi.inmobihackday.activities.MapsActivity" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New CheckBox"
+                android:id="@+id/checkBox"
+                android:layout_gravity="center_horizontal" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?selectableItemBackground"
+                android:text="START NOW"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>
