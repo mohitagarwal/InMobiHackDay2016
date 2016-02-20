@@ -10,12 +10,11 @@ import lombok.Data;
 @Data
 public class User {
 
-    @SerializedName("username")
-    private String username;
+    private String name;
 
     @SerializedName("user_id")
     private String userId;
 
-    @SerializedName("organisation_id")
-    private String organisationId;
+    @SerializedName("org_id")
+    private String orgId;
 }

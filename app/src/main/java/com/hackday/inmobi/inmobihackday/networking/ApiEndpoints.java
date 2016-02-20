@@ -1,9 +1,10 @@
 package com.hackday.inmobi.inmobihackday.networking;
 
-import com.hackday.inmobi.inmobihackday.networking.response.BaseResponse;
+import com.hackday.inmobi.inmobihackday.networking.responsemodel.AcceptRideRequestPOJO;
 import com.hackday.inmobi.inmobihackday.networking.responsemodel.AvailableRides;
 import com.hackday.inmobi.inmobihackday.networking.responsemodel.RegisterRidePOJO;
 import com.hackday.inmobi.inmobihackday.networking.responsemodel.RideDetails;
+import com.hackday.inmobi.inmobihackday.networking.responsemodel.UpdateRiderLocationPOJO;
 
 import java.util.List;
 
@@ -29,5 +30,9 @@ public interface ApiEndpoints {
     @POST("registerRide")
     Call<RideDetails> registerRide(@Body RegisterRidePOJO postBody);
 
-    
+    @POST("updateRiderLocation")
+    Call updateRiderLocation(@Body UpdateRiderLocationPOJO riderLocation);
+
+    @POST("acceptRideRequest")
+    Call acceptRideRequest(@Body AcceptRideRequestPOJO postBody);
 }
