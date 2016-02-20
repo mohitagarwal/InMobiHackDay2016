@@ -4,6 +4,12 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
 
+    signingConfigs {
+        debug {
+            storeFile file("keystore/debug.keystore")
+        }
+    }
+
     defaultConfig {
         applicationId "com.hackday.inmobi.inmobihackday"
         minSdkVersion 21
