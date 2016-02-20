@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_id": "inmobihackday2016",
+    "project_number": "463210346817",
+    "name": "InMobiHackDay2016"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:463210346817:android:f6b58c52696129ba",
+        "client_id": "android:com.hackday.inmobi.inmobihackday",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.hackday.inmobi.inmobihackday"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "463210346817-sgcd12r86bertk3hrl1n6f9hoerkjdh2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hackday.inmobi.inmobihackday",
+            "certificate_hash": "29CE7509518FC61C384743255E4ABBE65A621F3F"
+          }
+        },
+        {
+          "client_id": "463210346817-v2fbvlhamon6vount4iep1pjabkgo8l2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
