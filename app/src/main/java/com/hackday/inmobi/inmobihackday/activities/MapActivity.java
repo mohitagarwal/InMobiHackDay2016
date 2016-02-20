@@ -44,7 +44,6 @@ public class MapActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                registerRidersRide();
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -153,17 +152,17 @@ public class MapActivity extends AppCompatActivity
 
 
     private void registerRidersRide() {
-        Call<BaseResponse> call = RetroFitApiService.getInstance().registerRide();
-        call.enqueue(new Callback<BaseResponse>() {
-            @Override
-            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
-                Toast.makeText(MapActivity.this, "Success", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(Call<BaseResponse> call, Throwable t) {
-                Toast.makeText(MapActivity.this, "Failure", Toast.LENGTH_SHORT).show();
-            }
-        });
+//        Call<BaseResponse> call = RetroFitApiService.getInstance().registerRide();
+//        call.enqueue(new Callback<BaseResponse>() {
+//            @Override
+//            public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+//                Toast.makeText(MapActivity.this, "Success", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<BaseResponse> call, Throwable t) {
+//                Toast.makeText(MapActivity.this, "Failure", Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 }
